@@ -56,6 +56,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
         return false;
     }
 
+    //返回支持的注解类型
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotationTypes = new HashSet<>();
@@ -63,6 +64,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
         return annotationTypes;
     }
 
+    //返回支持的源码版本
     @Override
     public SourceVersion getSupportedSourceVersion() {
         return SourceVersion.latestSupported();
@@ -76,7 +78,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(RBindView.class);
         for (Element element : elements) {
-            // 获取 BindView 注解的值
+            // 获取 BindView 注解的值。例如：   @RBindView(R.id.tv_test)，那么value就是R.id.tv_test的int值
             int viewId = element.getAnnotation(RBindView.class).value();
 
             // 代表被注解的元素
@@ -124,6 +126,8 @@ public class ViewInjectProcessor extends AbstractProcessor {
                     // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
                     System.out.println("LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + variableInfo.getViewId());
                     constructor.addStatement("activity.$L=($L)activity.findViewById($L)", variableName, variableFullName, variableInfo.getViewId());
+
+                    // activity.textView=(android.widget.TextView)activity.findViewById(2131165326);
                 }
 
                 // 构建Class
@@ -134,9 +138,10 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
                 // 与目标Class放在同一个包下，解决Class属性的可访问性
                 String packageFullName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
+
                 System.out.println("LHDDD ======================= = " + packageFullName);
-                JavaFile javaFile = JavaFile.builder(packageFullName, typeSpec)
-                        .build();
+
+                JavaFile javaFile = JavaFile.builder(packageFullName, typeSpec).build();
                 // 生成class文件
                 javaFile.writeTo(filer);
             }

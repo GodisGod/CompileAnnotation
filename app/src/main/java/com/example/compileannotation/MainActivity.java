@@ -27,6 +27,18 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText("测试编译时注解");
             }
         });
+
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+
+    public void onClickTest(){
+
     }
 
 }

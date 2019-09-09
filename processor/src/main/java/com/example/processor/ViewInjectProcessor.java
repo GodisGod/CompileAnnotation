@@ -127,7 +127,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
                 }
 
                 // 构建Class
-                TypeSpec typeSpec = TypeSpec.classBuilder(typeElement.getSimpleName() + "$$ViewInjector")
+                TypeSpec typeSpec = TypeSpec.classBuilder(typeElement.getSimpleName() + "$$Proxy")
                         .addModifiers(Modifier.PUBLIC)
                         .addMethod(constructor.build())
                         .build();

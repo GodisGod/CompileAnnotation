@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        InjectHelper.inject(this);
-        System.out.println("LHDDD MainActivity InjectHelper");
+        RInject.inject(this);
+        System.out.println("LHDDD MainActivity RInject");
 
         findViewById(R.id.btn_test).setOnClickListener(new View.OnClickListener() {
             @Override

@@ -4,19 +4,17 @@ package com.example.compileannotation;
 import android.app.Activity;
 import android.util.Log;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.lang.reflect.Constructor;
 
 /**
  * 用来实例化MainActivity$$ViewInjector
  */
 
-public class InjectHelper {
+public class RInject {
     public static void inject(Activity host) {
         //获得 View 所在 Activity 的类路径，然后拼接一个字符串“$$ViewInjector”。
         // 这个是编译时动态生成的 Class 的完整路径，也就是我们需要实现的，同时也是最关键的部分；
-        String classFullName = host.getClass().getName() + "$$ViewInjector";
+        String classFullName = host.getClass().getName() + "$$Proxy";
         Log.i("LHD", "classFullName = " + classFullName);
         try {
 //            根据 Class 路径，使用 Class.forName(classFullName) 生成 Class 对象；

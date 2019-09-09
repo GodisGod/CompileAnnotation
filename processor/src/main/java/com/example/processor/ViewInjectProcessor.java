@@ -1,7 +1,6 @@
 package com.example.processor;
 
 import com.example.annotation.RBindView;
-import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -19,10 +18,7 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -31,9 +27,6 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
-//@SupportedAnnotationTypes({"com.example.annotation.RBindView"})
-//@SupportedSourceVersion(SourceVersion.RELEASE_7)
-@AutoService(Processor.class)
 public class ViewInjectProcessor extends AbstractProcessor {
 
     //存放同一个Class下的所有注解信息

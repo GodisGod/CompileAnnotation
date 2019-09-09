@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 
 public class RInject {
     public static void inject(Activity host) {
-        //获得 View 所在 Activity 的类路径，然后拼接一个字符串“$$ViewInjector”。
+        //获得 View 所在 Activity 的类路径，然后拼接一个字符串“$$Proxy”。
         // 这个是编译时动态生成的 Class 的完整路径，也就是我们需要实现的，同时也是最关键的部分；
         String classFullName = host.getClass().getName() + "$$Proxy";
         Log.i("LHD", "classFullName = " + classFullName);

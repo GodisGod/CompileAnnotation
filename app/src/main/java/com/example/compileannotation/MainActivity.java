@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.example.annotation.DBindView;
 import com.example.annotation.DClick;
+import com.example.annotation.DLongClick;
 
 //@ViewProcessor(name = "Method")
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
     @DClick(R.id.btn_test)
     public void onClickTest() {
         textView.setText("测试编译时注解 btnTest");
+    }
+
+    @DLongClick(R.id.tv_test)
+    public void onLongClickTest() {
+        textView.setText("测试编译时注解,长按点击事件测试,textView");
     }
 
 }

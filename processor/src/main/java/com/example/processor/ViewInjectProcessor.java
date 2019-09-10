@@ -159,42 +159,72 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
                         ExecutableElement executableElement = (ExecutableElement) e;
 
+                        if (!checkMethod(executableElement)) {
+                            return;
+                        }
+
                         // 变量类型的完整类路径（比如：android.widget.TextView）
-                        String variableFullName = e.getSimpleName().toString();
+//                        String variableFullName = e.getSimpleName().toString();
 
                         // 获取 BindView 注解的值
                         DClick dBindView = e.getAnnotation(DClick.class);
-                        int viewId = dBindView.value();
+                        if (dBindView != null) {
+                            int viewId = dBindView.value();
 
-                        // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
-                        messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
+                            // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+                            messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableInfo.getViewId() = " + viewId);
 
-                        methodBuilder.addStatement(
-                                "android.view.View view = (android.view.View)activity.findViewById($L)",
-                                viewId);
+                            methodBuilder.addStatement(
+                                    "android.view.View view = (android.view.View)activity.findViewById($L)",
+                                    viewId);
 
-                        //2、绑定点击事件
-                        //    activity.textView.setOnClickListener(new View.OnClickListener() {
-                        //      @Override
-                        //      public void onClick(View v) {
-                        //        activity.onClickTest();
-                        //      }
-                        //    });
+                            //2、绑定点击事件
+                            MethodSpec innerMethodSpec = MethodSpec.methodBuilder("onClick")
+                                    .addAnnotation(Override.class)
+                                    .addModifiers(Modifier.PUBLIC)
+                                    .returns(void.class)
+                                    .addParameter(ClassName.get("android.view", "View"), "v")
+                                    .addStatement("activity.$L()", executableElement.getSimpleName().toString())
+                                    .build();
+                            TypeSpec innerTypeSpec = TypeSpec.anonymousClassBuilder("")
+                                    .addSuperinterface(ClassName.bestGuess("View.OnClickListener"))
+                                    .addMethod(innerMethodSpec)
+                                    .build();
+                            methodBuilder.addStatement("view.setOnClickListener($L)", innerTypeSpec);
 
-//                        activity.onClickTest=(()void)activity.findViewById(2131165218);
+                        }
 
-                        MethodSpec innerMethodSpec = MethodSpec.methodBuilder("onClick")
-                                .addAnnotation(Override.class)
-                                .addModifiers(Modifier.PUBLIC)
-                                .returns(void.class)
-                                .addParameter(ClassName.get("android.view", "View"), "v")
-                                .addStatement("activity.$L()", executableElement.getSimpleName().toString())
-                                .build();
-                        TypeSpec innerTypeSpec = TypeSpec.anonymousClassBuilder("")
-                                .addSuperinterface(ClassName.bestGuess("View.OnClickListener"))
-                                .addMethod(innerMethodSpec)
-                                .build();
-                        methodBuilder.addStatement("view.setOnClickListener($L)", innerTypeSpec);
+
+                        // 获取 BindView 注解的值
+                        DLongClick dBindView2 = e.getAnnotation(DLongClick.class);
+
+                        if (dBindView2 != null) {
+                            int viewId2 = dBindView2.value();
+
+                            // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+                            messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableInfo.getViewId() = " + viewId2);
+
+                            methodBuilder.addStatement(
+                                    "android.view.View longClickView = (android.view.View)activity.findViewById($L)",
+                                    viewId2);
+
+                            //2、绑定点击事件
+                            MethodSpec innerMethodSpec2 = MethodSpec.methodBuilder("onLongClick")
+                                    .addAnnotation(Override.class)
+                                    .addModifiers(Modifier.PUBLIC)
+                                    .returns(TypeName.BOOLEAN)
+                                    .addParameter(ClassName.get("android.view", "View"), "v")
+                                    .addStatement("activity.$L()", executableElement.getSimpleName().toString())
+                                    .addStatement("return true")
+                                    .build();
+                            TypeSpec innerTypeSpec2 = TypeSpec.anonymousClassBuilder("")
+                                    .addSuperinterface(ClassName.bestGuess("View.OnLongClickListener"))
+                                    .addMethod(innerMethodSpec2)
+                                    .build();
+                            methodBuilder.addStatement("longClickView.setOnLongClickListener($L)", innerTypeSpec2);
+
+                        }
+
                     }
 
 

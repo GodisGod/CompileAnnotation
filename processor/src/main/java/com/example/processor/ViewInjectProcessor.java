@@ -128,7 +128,8 @@ public class ViewInjectProcessor extends AbstractProcessor {
             //1、 使用构造函数绑定视图数据
             MethodSpec.Builder methodBuilder = MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(ParameterSpec.builder(TypeName.get(typeElement.asType()), "activity", Modifier.FINAL).build());
+                    .addParameter(ParameterSpec.builder(TypeName.get(typeElement.asType()), "target", Modifier.FINAL).build())
+                    .addParameter(ClassName.get("android.view", "View"), "v");
 
             try {
                 // Class的完整路径
@@ -149,11 +150,11 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         DBindView dBindView = e.getAnnotation(DBindView.class);
                         int viewId = dBindView.value();
 
-                        // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+                        // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
                         messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
 
-                        // activity.textView=(android.widget.TextView)activity.findViewById(2131165326);
-                        methodBuilder.addStatement("activity.$L=($L)activity.findViewById($L)", variableName, variableFullName, viewId);
+                        // target.textView=(android.widget.TextView)v.findViewById(2131165326);
+                        methodBuilder.addStatement("target.$L=($L)v.findViewById($L)", variableName, variableFullName, viewId);
 
                     } else if (kind == ElementKind.METHOD) {
 
@@ -171,11 +172,11 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         if (dBindView != null) {
                             int viewId = dBindView.value();
 
-                            // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+                            // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
                             messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableInfo.getViewId() = " + viewId);
 
                             methodBuilder.addStatement(
-                                    "android.view.View view = (android.view.View)activity.findViewById($L)",
+                                    "android.view.View view = (android.view.View)v.findViewById($L)",
                                     viewId);
 
                             //2、绑定点击事件
@@ -184,7 +185,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
                                     .addModifiers(Modifier.PUBLIC)
                                     .returns(void.class)
                                     .addParameter(ClassName.get("android.view", "View"), "v")
-                                    .addStatement("activity.$L()", executableElement.getSimpleName().toString())
+                                    .addStatement("target.$L()", executableElement.getSimpleName().toString())
                                     .build();
                             TypeSpec innerTypeSpec = TypeSpec.anonymousClassBuilder("")
                                     .addSuperinterface(ClassName.bestGuess("View.OnClickListener"))
@@ -201,11 +202,11 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         if (dBindView2 != null) {
                             int viewId2 = dBindView2.value();
 
-                            // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+                            // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
                             messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableInfo.getViewId() = " + viewId2);
 
                             methodBuilder.addStatement(
-                                    "android.view.View longClickView = (android.view.View)activity.findViewById($L)",
+                                    "android.view.View longClickView = (android.view.View)v.findViewById($L)",
                                     viewId2);
 
                             //2、绑定点击事件
@@ -214,7 +215,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
                                     .addModifiers(Modifier.PUBLIC)
                                     .returns(TypeName.BOOLEAN)
                                     .addParameter(ClassName.get("android.view", "View"), "v")
-                                    .addStatement("activity.$L()", executableElement.getSimpleName().toString())
+                                    .addStatement("target.$L()", executableElement.getSimpleName().toString())
                                     .addStatement("return true")
                                     .build();
                             TypeSpec innerTypeSpec2 = TypeSpec.anonymousClassBuilder("")
@@ -230,8 +231,10 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
                 }
 
+                final String pakageName = getPackageName(typeElement);
+                final String className = getClassName(typeElement, pakageName) + "$$Proxy";
                 //2、构建Class
-                TypeSpec typeSpec = TypeSpec.classBuilder(typeElement.getSimpleName() + "$$Proxy")
+                TypeSpec typeSpec = TypeSpec.classBuilder(className)
                         .addModifiers(Modifier.PUBLIC)
                         .addMethod(methodBuilder.build())
                         .build();
@@ -254,6 +257,19 @@ public class ViewInjectProcessor extends AbstractProcessor {
         }
 
 
+    }
+
+    private String getClassName(TypeElement type, String pkgName) {
+        int packageLength = pkgName.length() + 1;
+
+        messager.printMessage(Diagnostic.Kind.NOTE, "pakageName = " + pkgName + "  type.getQualifiedName().toString() = " + type.getQualifiedName().toString());
+
+        //com.example.compileannotation.TestAdapter.TestHolder
+        return type.getQualifiedName().toString().substring(packageLength).replace('.', '$');
+    }
+
+    private String getPackageName(TypeElement type) {
+        return elementUtils.getPackageOf(type).getQualifiedName().toString();
     }
 
 }

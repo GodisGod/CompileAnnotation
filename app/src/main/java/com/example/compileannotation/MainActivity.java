@@ -1,10 +1,13 @@
 package com.example.compileannotation;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.annotation.DBindView;
@@ -19,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
 
     @DBindView(R.id.btn_test)
     Button btnTest;
+
+    @DBindView(R.id.recycler_test)
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText("测试编译时注解 textView");
             }
         });
+
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        recyclerView.setAdapter(new TestAdapter(this));
+        recyclerView.setHasFixedSize(true);
+
     }
 
     @DClick(R.id.btn_test)

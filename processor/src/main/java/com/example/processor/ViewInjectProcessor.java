@@ -1,12 +1,16 @@
 package com.example.processor;
 
-import com.example.annotation.RBindView;
+import com.example.annotation.DBindView;
+import com.example.annotation.DClick;
+import com.example.annotation.DLongClick;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +25,8 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -29,10 +35,8 @@ import javax.tools.Diagnostic;
 
 public class ViewInjectProcessor extends AbstractProcessor {
 
-    //存放同一个Class下的所有注解信息
-    Map<String, List<VariableInfo>> classMap = new HashMap<>();
-    // 存放Class对应的信息：TypeElement
-    Map<String, TypeElement> classTypeElement = new HashMap<>();
+    //存放同一个Class下的所有视图注解信息,key = 类名 value = 注解元素集合
+    Map<TypeElement, List<Element>> classMap = new HashMap<>();
 
     private Filer filer;
     Elements elementUtils;//操作元素
@@ -52,7 +56,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
         //1、收集 Class 内的所有被 @BindView 注解的成员变量；
         collectInfo(roundEnvironment);
         //2、根据上一步收集的内容，生成 .java 源文件。
-        writeToFile();
+        generateCode();
         return false;
     }
 
@@ -60,7 +64,9 @@ public class ViewInjectProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotationTypes = new HashSet<>();
-        annotationTypes.add(RBindView.class.getCanonicalName());
+        annotationTypes.add(DBindView.class.getCanonicalName());
+        annotationTypes.add(DClick.class.getCanonicalName());
+        annotationTypes.add(DLongClick.class.getCanonicalName());
         return annotationTypes;
     }
 
@@ -72,68 +78,132 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
     void collectInfo(RoundEnvironment roundEnvironment) {
         classMap.clear();
-        classTypeElement.clear();
 
-        messager.printMessage(Diagnostic.Kind.NOTE, "开始解析注解");
+        messager.printMessage(Diagnostic.Kind.NOTE, "开始收集注解信息");
 
-        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(RBindView.class);
-        for (Element element : elements) {
-            // 获取 BindView 注解的值。例如：   @RBindView(R.id.tv_test)，那么value就是R.id.tv_test的int值
-            int viewId = element.getAnnotation(RBindView.class).value();
+        checkAllAnnotations(roundEnvironment, DBindView.class);
+        checkAllAnnotations(roundEnvironment, DClick.class);
+        checkAllAnnotations(roundEnvironment, DLongClick.class);
 
-            // 代表被注解的元素
-            VariableElement variableElement = (VariableElement) element;
-
-            // 备注解元素所在的Class
-            TypeElement typeElement = (TypeElement) variableElement.getEnclosingElement();
-            // Class的完整路径
-            String classFullName = typeElement.getQualifiedName().toString();
-
-            // 收集Class中所有被注解的元素
-            List<VariableInfo> variableList = classMap.get(classFullName);
-            if (variableList == null) {
-                variableList = new ArrayList<>();
-                classMap.put(classFullName, variableList);
-
-                // 保存Class对应要素（名称、完整路径等）
-                classTypeElement.put(classFullName, typeElement);
-            }
-            VariableInfo variableInfo = new VariableInfo();
-            variableInfo.setVariableElement(variableElement);
-            variableInfo.setViewId(viewId);
-            variableList.add(variableInfo);
-        }
+        messager.printMessage(Diagnostic.Kind.NOTE, "注解信息收集完毕");
     }
 
+    private void checkAllAnnotations(RoundEnvironment roundEnvironment, Class<? extends Annotation> annotationClass) {
+        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(annotationClass);
+
+        for (Element element : elements) {
+            //被注解元素所在的Class
+            TypeElement typeElement = (TypeElement) element.getEnclosingElement();
+
+            // 收集Class中所有被注解的元素
+            List<Element> els = classMap.get(typeElement);
+            if (els == null) {
+                els = new ArrayList<>();
+                classMap.put(typeElement, els);
+            }
+            els.add(element);
+        }
+
+    }
+
+    private boolean checkMethod(Element element) {
+        if (element.getKind() != ElementKind.METHOD) {
+            return false;
+        }
+        if (MethodCheckUtil.isPrivate(element) || MethodCheckUtil.isAbstract(element)) {
+            return false;
+        }
+        return true;
+    }
+
+
     //通过 javapoet 来生成 .java 源文件
-    void writeToFile() {
+    void generateCode() {
         messager.printMessage(Diagnostic.Kind.NOTE, "开始生成相关类文件");
-        try {
-            for (String classFullName : classMap.keySet()) {
-                TypeElement typeElement = classTypeElement.get(classFullName);
 
-                // 使用构造函数绑定数据
-                MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PUBLIC)
-                        .addParameter(ParameterSpec.builder(TypeName.get(typeElement.asType()), "activity").build());
-                List<VariableInfo> variableList = classMap.get(classFullName);
-                for (VariableInfo variableInfo : variableList) {
-                    VariableElement variableElement = variableInfo.getVariableElement();
-                    // 变量名称(比如：TextView tv 的 tv)
-                    String variableName = variableElement.getSimpleName().toString();
-                    // 变量类型的完整类路径（比如：android.widget.TextView）
-                    String variableFullName = variableElement.asType().toString();
-                    // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
-                    System.out.println("LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + variableInfo.getViewId());
-                    constructor.addStatement("activity.$L=($L)activity.findViewById($L)", variableName, variableFullName, variableInfo.getViewId());
+        /**
+         * 遍历每一个类
+         */
+        for (TypeElement typeElement : classMap.keySet()) {
+            //1、 使用构造函数绑定视图数据
+            MethodSpec.Builder methodBuilder = MethodSpec.constructorBuilder()
+                    .addModifiers(Modifier.PUBLIC)
+                    .addParameter(ParameterSpec.builder(TypeName.get(typeElement.asType()), "activity", Modifier.FINAL).build());
 
-                    // activity.textView=(android.widget.TextView)activity.findViewById(2131165326);
+            try {
+                // Class的完整路径
+                String classFullName = typeElement.getQualifiedName().toString();
+
+                List<Element> elements = classMap.get(typeElement);
+
+                for (Element e : elements) {
+                    ElementKind kind = e.getKind();
+
+                    if (kind == ElementKind.FIELD) {
+                        // 变量名称(比如：TextView tv 的 tv)
+                        String variableName = e.getSimpleName().toString();
+                        // 变量类型的完整类路径（比如：android.widget.TextView）
+                        String variableFullName = e.asType().toString();
+
+                        // 获取 BindView 注解的值
+                        DBindView dBindView = e.getAnnotation(DBindView.class);
+                        int viewId = dBindView.value();
+
+                        // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+                        messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
+
+                        // activity.textView=(android.widget.TextView)activity.findViewById(2131165326);
+                        methodBuilder.addStatement("activity.$L=($L)activity.findViewById($L)", variableName, variableFullName, viewId);
+
+                    } else if (kind == ElementKind.METHOD) {
+
+                        ExecutableElement executableElement = (ExecutableElement) e;
+
+                        // 变量类型的完整类路径（比如：android.widget.TextView）
+                        String variableFullName = e.getSimpleName().toString();
+
+                        // 获取 BindView 注解的值
+                        DClick dBindView = e.getAnnotation(DClick.class);
+                        int viewId = dBindView.value();
+
+                        // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+                        messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
+
+                        methodBuilder.addStatement(
+                                "android.view.View view = (android.view.View)activity.findViewById($L)",
+                                viewId);
+
+                        //2、绑定点击事件
+                        //    activity.textView.setOnClickListener(new View.OnClickListener() {
+                        //      @Override
+                        //      public void onClick(View v) {
+                        //        activity.onClickTest();
+                        //      }
+                        //    });
+
+//                        activity.onClickTest=(()void)activity.findViewById(2131165218);
+
+                        MethodSpec innerMethodSpec = MethodSpec.methodBuilder("onClick")
+                                .addAnnotation(Override.class)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(void.class)
+                                .addParameter(ClassName.get("android.view", "View"), "v")
+                                .addStatement("activity.$L()", executableElement.getSimpleName().toString())
+                                .build();
+                        TypeSpec innerTypeSpec = TypeSpec.anonymousClassBuilder("")
+                                .addSuperinterface(ClassName.bestGuess("View.OnClickListener"))
+                                .addMethod(innerMethodSpec)
+                                .build();
+                        methodBuilder.addStatement("view.setOnClickListener($L)", innerTypeSpec);
+                    }
+
+
                 }
 
-                // 构建Class
+                //2、构建Class
                 TypeSpec typeSpec = TypeSpec.classBuilder(typeElement.getSimpleName() + "$$Proxy")
                         .addModifiers(Modifier.PUBLIC)
-                        .addMethod(constructor.build())
+                        .addMethod(methodBuilder.build())
                         .build();
 
                 // 与目标Class放在同一个包下，解决Class属性的可访问性
@@ -144,10 +214,84 @@ public class ViewInjectProcessor extends AbstractProcessor {
                 JavaFile javaFile = JavaFile.builder(packageFullName, typeSpec).build();
                 // 生成class文件
                 javaFile.writeTo(filer);
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
+
         }
+
+
     }
+
+
+//    private void generatedAllBindView() {
+//
+//
+//    }
+//
+//    private void generatedAllClickEvent(MethodSpec.Builder methodBuilder) {
+//        try {
+//            for (String classFullName : classMapClickEvent.keySet()) {
+//                TypeElement typeElement = classTypeElement.get(classFullName);
+//
+//                methodBuilder.addParameter(ParameterSpec.builder(TypeName.get(typeElement.asType()), "activity").build());
+//
+//                List<ExecutableElement> executableElements = classMapClickEvent.get(classFullName);
+//
+//                for (ExecutableElement element : executableElements) {
+//
+//                    // 变量名称(比如：TextView tv 的 tv)
+//                    String variableName = element.getSimpleName().toString();
+//                    // 变量类型的完整类路径（比如：android.widget.TextView）
+//                    String variableFullName = element.asType().toString();
+//
+//                    // 获取 BindView 注解的值
+//                    DBindView dBindView = element.getAnnotation(DBindView.class);
+//                    int viewId = dBindView.value();
+//
+//                    // 在构造方法中增加赋值语句，例如：activity.tv = (android.widget.TextView)activity.findViewById(215334);
+//                    messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
+//
+//                    methodBuilder.addStatement(
+//                            "activity.$L=($L)activity.findViewById($L)",
+//                            variableName,
+//                            variableFullName,
+//                            viewId);
+//                }
+//
+//                //2、绑定点击事件
+//                //    activity.textView.setOnClickListener(new View.OnClickListener() {
+//                //      @Override
+//                //      public void onClick(View v) {
+//                //        activity.onClickTest();
+//                //      }
+//                //    });
+//
+//                MethodSpec methodSpec = MethodSpec.methodBuilder("onClick")
+//                        .addAnnotation(Override.class)
+//                        .addModifiers(Modifier.PUBLIC)
+//                        .returns(void.class)
+//                        .addParameter(ClassName.get("android.view", "View"), "v")
+//                        .addStatement("activity.$L", typeElement.getSimpleName().toString())
+//                        .build();
+//
+//
+//                //3、构建Class
+//                TypeSpec typeSpec = TypeSpec.annotationBuilder("")
+//                        .addSuperinterface(ClassName.bestGuess("View.OnClickListener"))
+//                        .addMethod(methodSpec)
+//                        .build();
+//
+//                methodBuilder.addStatement("", typeSpec);
+//
+//            }
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//    }
+
 
 }

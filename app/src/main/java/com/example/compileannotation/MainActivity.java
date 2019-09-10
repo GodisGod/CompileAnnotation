@@ -4,15 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.annotation.RBindView;
+import com.example.annotation.DBindView;
+import com.example.annotation.DClick;
 
 //@ViewProcessor(name = "Method")
 public class MainActivity extends AppCompatActivity {
 
-    @RBindView(R.id.tv_test)
+    @DBindView(R.id.tv_test)
     TextView textView;
+
+    @DBindView(R.id.btn_test)
+    Button btnTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,24 +26,24 @@ public class MainActivity extends AppCompatActivity {
         RInject.inject(this);
         System.out.println("LHDDD MainActivity RInject");
 
-        findViewById(R.id.btn_test).setOnClickListener(new View.OnClickListener() {
+       /* btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 textView.setText("测试编译时注解");
             }
-        });
+        });*/
 
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                textView.setText("测试编译时注解 textView");
             }
         });
     }
 
-
-    public void onClickTest(){
-
+    @DClick(R.id.btn_test)
+    public void onClickTest() {
+        textView.setText("测试编译时注解 btnTest");
     }
 
 }

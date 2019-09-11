@@ -1,4 +1,4 @@
-package com.example.compileannotation;
+package com.example.dcompiler;
 
 
 import android.app.Activity;
@@ -23,11 +23,15 @@ public class DInject {
 
     public static void inject(Object target, View view) {
         //获得 View 所在 Activity 的类路径，然后拼接一个字符串“$$Proxy”。
-
+        Log.e("LHD", "target = " + target + "  view = " + view);
         Constructor constructor = getBind(target.getClass());
 
         try {
-            constructor.newInstance(target, view);
+            if (constructor == null) {
+                throw new IllegalAccessException(target.getClass().getName() + "$$Proxy" + "构造方法为null");
+            } else {
+                constructor.newInstance(target, view);
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {

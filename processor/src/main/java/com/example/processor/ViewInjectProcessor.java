@@ -29,7 +29,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
@@ -76,7 +75,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
         return SourceVersion.latestSupported();
     }
 
-    void collectInfo(RoundEnvironment roundEnvironment) {
+    private void collectInfo(RoundEnvironment roundEnvironment) {
         classMap.clear();
 
         messager.printMessage(Diagnostic.Kind.NOTE, "开始收集注解信息");
@@ -88,8 +87,12 @@ public class ViewInjectProcessor extends AbstractProcessor {
         messager.printMessage(Diagnostic.Kind.NOTE, "注解信息收集完毕");
     }
 
-    private void checkAllAnnotations(RoundEnvironment roundEnvironment, Class<? extends Annotation> annotationClass) {
+    private boolean checkAllAnnotations(RoundEnvironment roundEnvironment, Class<? extends Annotation> annotationClass) {
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(annotationClass);
+
+        if (elements == null || elements.size() < 1) {
+            messager.printMessage(Diagnostic.Kind.NOTE, "没有收集到注解信息:" + annotationClass);
+        }
 
         for (Element element : elements) {
             //被注解元素所在的Class
@@ -100,9 +103,12 @@ public class ViewInjectProcessor extends AbstractProcessor {
             if (els == null) {
                 els = new ArrayList<>();
                 classMap.put(typeElement, els);
+                messager.printMessage(Diagnostic.Kind.NOTE, "解析类 = " + typeElement.asType().toString() + "  " + annotationClass);
             }
             els.add(element);
         }
+
+        return true;
 
     }
 

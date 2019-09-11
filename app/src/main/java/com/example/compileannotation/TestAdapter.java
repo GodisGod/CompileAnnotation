@@ -46,7 +46,7 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull TestHolder holder, int position) {
-//        holder.textView.setText(strings.get(position));
+        holder.textView.setText(strings.get(position));
         holder.itemView.setTag(position);
     }
 
@@ -59,7 +59,8 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestHolder> {
 
         @DBindView(R.id.tv_item_test)
         TextView textView;
-//
+
+        //
         public TestHolder(@NonNull View itemView) {
             super(itemView);
             DInject.inject(this, itemView);

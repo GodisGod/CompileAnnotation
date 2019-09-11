@@ -60,7 +60,7 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestHolder> {
         @DBindView(R.id.tv_item_test)
         TextView textView;
 
-        //
+
         public TestHolder(@NonNull View itemView) {
             super(itemView);
             DInject.inject(this, itemView);

@@ -92,6 +92,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
         if (elements == null || elements.size() < 1) {
             messager.printMessage(Diagnostic.Kind.NOTE, "没有收集到注解信息:" + annotationClass);
+            return false;
         }
 
         for (Element element : elements) {

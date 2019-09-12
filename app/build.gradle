@@ -27,8 +27,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'
 
-    implementation project(path: ':dcompiler')
+//    implementation project(path: ':dcompiler')
 //    implementation project(path: ':annotation')
     annotationProcessor project(path: ':processor')
+
+//    implementation 'com.github.GodisGod:CompileAnnotation:Tag'
 
 }

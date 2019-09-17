@@ -10,9 +10,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.annotation.DBindView;
-import com.example.annotation.DClick;
-import com.example.annotation.DLongClick;
+import com.example.annotation.BindView;
+import com.example.annotation.ClickEvent;
+import com.example.annotation.LongClickEvent;
 import com.example.dcompiler.DInject;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestHolder> {
 
     class TestHolder extends RecyclerView.ViewHolder {
 
-        @DBindView(R.id.tv_item_test)
+        @BindView(R.id.tv_item_test)
         TextView textView;
 
 
@@ -66,12 +66,12 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestHolder> {
             DInject.inject(this, itemView);
         }
 
-        @DClick(R.id.tv_item_test)
+        @ClickEvent(R.id.tv_item_test)
         public void onItemClick() {
             Toast.makeText(context, "onItemClick 点击了ietm = " + itemView.getTag(), Toast.LENGTH_SHORT).show();
         }
 
-        @DLongClick(R.id.tv_item_test)
+        @LongClickEvent(R.id.tv_item_test)
         public void onItemLongClick() {
             Toast.makeText(context, "onItemLongClick 点击了ietm = " + itemView.getTag(), Toast.LENGTH_SHORT).show();
         }

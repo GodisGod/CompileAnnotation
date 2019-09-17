@@ -9,21 +9,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.annotation.DBindView;
-import com.example.annotation.DClick;
-import com.example.annotation.DLongClick;
+import com.example.annotation.BindView;
+import com.example.annotation.ClickEvent;
+import com.example.annotation.ClickEvents;
+import com.example.annotation.LongClickEvent;
 import com.example.dcompiler.DInject;
 
 //@ViewProcessor(name = "Method")
 public class MainActivity extends AppCompatActivity {
 
-    @DBindView(R.id.tv_test)
+    @BindView(R.id.tv_test)
     TextView textView;
 
-    @DBindView(R.id.btn_test)
+    @BindView(R.id.btn_test)
     Button btnTest;
 
-    @DBindView(R.id.recycler_test)
+    @BindView(R.id.recycler_test)
     RecyclerView recyclerView;
 
     @Override
@@ -33,13 +34,15 @@ public class MainActivity extends AppCompatActivity {
         DInject.inject(this);
         System.out.println("LHDDD MainActivity DInject");
 
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                textView.setText("测试编译时注解 textView");
-            }
-        });
+//        textView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                textView.setText("测试编译时注解 textView");
+//            }
+//        });
 
+        btnTest.setTag("我是btnTest");
+        textView.setTag("我是textView");
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setAdapter(new TestAdapter(this));
@@ -47,22 +50,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @DClick(R.id.btn_test)
-    public void onClickTest() {
-        textView.setText("测试编译时注解 btnTest");
+//    @ClickEvent(R.id.btn_test)
+//    public void onClickTest() {
+//        textView.setText("测试编译时注解 btnTest");
+//
+////        Intent intent = new Intent();
+////        intent.putExtra("name", "name");
+////        intent.setClass(MainActivity.this, SecondActivity.class);
+////        startActivity(intent);
+//
+//        new QJumpSencondActivity().addParamater("test", "testtest")
+//                .setFromTo(MainActivity.this, SecondActivity.class)
+//                .start();
+//
+//    }
 
-//        Intent intent = new Intent();
-//        intent.putExtra("name", "name");
-//        intent.setClass(MainActivity.this, SecondActivity.class);
-//        startActivity(intent);
-
-        new QJumpSencondActivity().addParamater("test", "testtest")
-                .setFromTo(MainActivity.this, SecondActivity.class)
-                .start();
-
+    @ClickEvents({R.id.btn_test, R.id.tv_test})
+    public void allClickTest(View vvvvvv) {
+        if (vvvvvv.getId() == R.id.btn_test) {
+            textView.setText("测试编译时注解 btnTest + " + btnTest.getTag().toString());
+        } else if (vvvvvv.getId() == R.id.tv_test) {
+            textView.setText("测试编译时注解 textView + " + textView.getTag().toString());
+        }
     }
 
-    @DLongClick(R.id.tv_test)
+    @LongClickEvent(R.id.tv_test)
     public void onLongClickTest() {
         textView.setText("测试编译时注解,长按点击事件测试,textView");
     }

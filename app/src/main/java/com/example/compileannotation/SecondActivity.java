@@ -7,14 +7,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.example.annotation.DBindView;
+import com.example.annotation.BindView;
 import com.example.annotation.QJump;
 import com.example.dcompiler.DInject;
 
 public class SecondActivity extends AppCompatActivity {
 
 
-    @DBindView(R.id.tv_name)
+    @BindView(R.id.tv_name)
     TextView tvName;
 
     @QJump

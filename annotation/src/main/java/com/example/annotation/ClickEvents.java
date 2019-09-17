@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by hongda on 2019-09-10.
+ * Created by hongda on 2019-09-17.
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
-public @interface DLongClick {
-    int value();//需要绑定点击事件的控件的id
+public @interface ClickEvents {
+    int[] value();//需要绑定点击事件的控件的id
 }

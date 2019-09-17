@@ -1,8 +1,9 @@
 package com.example.processor;
 
-import com.example.annotation.DBindView;
-import com.example.annotation.DClick;
-import com.example.annotation.DLongClick;
+import com.example.annotation.BindView;
+import com.example.annotation.ClickEvent;
+import com.example.annotation.ClickEvents;
+import com.example.annotation.LongClickEvent;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -10,6 +11,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.awt.geom.IllegalPathStateException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -28,25 +28,27 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.tools.Diagnostic;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
+/**
+ * 视图绑定注解信息解析器
+ */
 public class ViewInjectProcessor extends AbstractProcessor {
 
     //存放同一个Class下的所有视图注解信息,key = 类名 value = 注解元素集合
     Map<TypeElement, List<Element>> classMap = new HashMap<>();
 
-    private Filer filer;
-    Elements elementUtils;//操作元素
-    private Messager messager;
-
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
-        this.filer = processingEnvironment.getFiler();
-        this.elementUtils = processingEnvironment.getElementUtils();
-        messager = processingEnvironment.getMessager();
+        DUtil dUtil = DUtil.getUtil();
+        dUtil.setElementUtils(processingEnvironment.getElementUtils());
+        dUtil.setFiler(processingEnvironment.getFiler());
+        dUtil.setMessager(processingEnvironment.getMessager());
+
     }
 
     @Override
@@ -63,9 +65,9 @@ public class ViewInjectProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotationTypes = new HashSet<>();
-        annotationTypes.add(DBindView.class.getCanonicalName());
-        annotationTypes.add(DClick.class.getCanonicalName());
-        annotationTypes.add(DLongClick.class.getCanonicalName());
+        annotationTypes.add(BindView.class.getCanonicalName());
+        annotationTypes.add(ClickEvent.class.getCanonicalName());
+        annotationTypes.add(LongClickEvent.class.getCanonicalName());
         return annotationTypes;
     }
 
@@ -78,20 +80,22 @@ public class ViewInjectProcessor extends AbstractProcessor {
     private void collectInfo(RoundEnvironment roundEnvironment) {
         classMap.clear();
 
-        messager.printMessage(Diagnostic.Kind.NOTE, "开始收集注解信息");
+        DUtil.log("开始收集注解信息");
 
-        checkAllAnnotations(roundEnvironment, DBindView.class);
-        checkAllAnnotations(roundEnvironment, DClick.class);
-        checkAllAnnotations(roundEnvironment, DLongClick.class);
+        checkAllAnnotations(roundEnvironment, BindView.class);
+        checkAllAnnotations(roundEnvironment, ClickEvent.class);
+        checkAllAnnotations(roundEnvironment, ClickEvents.class);
+        checkAllAnnotations(roundEnvironment, LongClickEvent.class);
 
-        messager.printMessage(Diagnostic.Kind.NOTE, "注解信息收集完毕");
+        DUtil.log("注解信息收集完毕");
     }
 
     private boolean checkAllAnnotations(RoundEnvironment roundEnvironment, Class<? extends Annotation> annotationClass) {
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(annotationClass);
 
         if (elements == null || elements.size() < 1) {
-            messager.printMessage(Diagnostic.Kind.NOTE, "没有收集到注解信息:" + annotationClass);
+
+            DUtil.log("没有收集到注解信息:" + annotationClass);
             return false;
         }
 
@@ -104,7 +108,8 @@ public class ViewInjectProcessor extends AbstractProcessor {
             if (els == null) {
                 els = new ArrayList<>();
                 classMap.put(typeElement, els);
-                messager.printMessage(Diagnostic.Kind.NOTE, "解析类 = " + typeElement.asType().toString() + "  " + annotationClass);
+
+                DUtil.log("解析类 = " + typeElement.asType().toString() + "  " + annotationClass);
             }
             els.add(element);
         }
@@ -126,7 +131,8 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
     //通过 javapoet 来生成 .java 源文件
     void generateCode() {
-        messager.printMessage(Diagnostic.Kind.NOTE, "开始生成相关类文件");
+
+        DUtil.log("开始生成相关类文件");
 
         /**
          * 遍历每一个类
@@ -154,11 +160,11 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         String variableFullName = e.asType().toString();
 
                         // 获取 BindView 注解的值
-                        DBindView dBindView = e.getAnnotation(DBindView.class);
-                        int viewId = dBindView.value();
+                        BindView bindView = e.getAnnotation(BindView.class);
+                        int viewId = bindView.value();
 
                         // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
-                        messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
+                        DUtil.log("LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
 
                         // target.textView=(android.widget.TextView)v.findViewById(2131165326);
                         methodBuilder.addStatement("target.$L=($L)v.findViewById($L)", variableName, variableFullName, viewId);
@@ -175,12 +181,12 @@ public class ViewInjectProcessor extends AbstractProcessor {
 //                        String variableFullName = e.getSimpleName().toString();
 
                         // 获取 BindView 注解的值
-                        DClick dBindView = e.getAnnotation(DClick.class);
+                        ClickEvent dBindView = e.getAnnotation(ClickEvent.class);
                         if (dBindView != null) {
                             int viewId = dBindView.value();
 
                             // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
-                            messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableInfo.getViewId() = " + viewId);
+                            DUtil.log("LHDDD" + "  variableInfo.getViewId() = " + viewId);
 
                             methodBuilder.addStatement(
                                     "android.view.View view = (android.view.View)v.findViewById($L)",
@@ -204,13 +210,13 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
 
                         // 获取 BindView 注解的值
-                        DLongClick dBindView2 = e.getAnnotation(DLongClick.class);
+                        LongClickEvent dBindView2 = e.getAnnotation(LongClickEvent.class);
 
                         if (dBindView2 != null) {
                             int viewId2 = dBindView2.value();
 
                             // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
-                            messager.printMessage(Diagnostic.Kind.NOTE, "LHDDD" + "  variableInfo.getViewId() = " + viewId2);
+                            DUtil.log("LHDDD" + "  variableInfo.getViewId() = " + viewId2);
 
                             methodBuilder.addStatement(
                                     "android.view.View longClickView = (android.view.View)v.findViewById($L)",
@@ -233,13 +239,61 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
                         }
 
+                        ClickEvents clickEvents = e.getAnnotation(ClickEvents.class);
+                        DUtil.log("LHDDD" + "  点击事件组 = clickEvents = " + clickEvents);
+                        if (clickEvents != null && clickEvents.value().length > 0) {
+
+                            List<? extends VariableElement> parameters = ((ExecutableElement) e).getParameters();
+                            DUtil.log("注解的方法的参数 = " + parameters.size() + " " + parameters.get(0));
+                            if (parameters == null || parameters.size() != 1) {
+                                DUtil.error("注解的方法必须有且只能有一个参数" + parameters.size());
+                                return;
+                            }
+
+                            VariableElement variableElement = parameters.get(0);
+                            TypeMirror typeMirror = variableElement.asType();
+                            String type = typeMirror.toString();
+                            if (!"android.view.View".equals(type)) {
+                                DUtil.error("注解的方法必须有且只有一个参数View");
+                                return;
+                            }
+
+                            for (int i = 0; i < clickEvents.value().length; i++) {
+
+                                int id = clickEvents.value()[i];
+                                // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
+                                String clickViewName = "View" + i;
+                                methodBuilder.addStatement(
+                                        "android.view.View " + clickViewName + " = (android.view.View)v.findViewById($L)",
+                                        id);
+
+                                //2、绑定点击事件
+                                MethodSpec innerMethodSpec = MethodSpec.methodBuilder("onClick")
+                                        .addAnnotation(Override.class)
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .returns(void.class)
+                                        .addParameter(ClassName.get("android.view", "View"), "v")
+                                        .addStatement("target.$L(v)", executableElement.getSimpleName().toString())
+                                        .build();
+                                TypeSpec innerTypeSpec = TypeSpec.anonymousClassBuilder("")
+                                        .addSuperinterface(ClassName.bestGuess("View.OnClickListener"))
+                                        .addMethod(innerMethodSpec)
+                                        .build();
+                                methodBuilder.addStatement(clickViewName + ".setOnClickListener($L)", innerTypeSpec);
+
+
+                            }
+
+                        }
+
+
                     }
 
 
                 }
 
-                final String pakageName = getPackageName(typeElement);
-                final String className = getClassName(typeElement, pakageName) + "$$Proxy";
+                final String pakageName = CommonUtils.getPackageName(typeElement);
+                final String className = CommonUtils.getClassName(typeElement, pakageName) + "$$Proxy";
                 //2、构建Class
                 TypeSpec typeSpec = TypeSpec.classBuilder(className)
                         .addModifiers(Modifier.PUBLIC)
@@ -247,36 +301,22 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         .build();
 
                 // 与目标Class放在同一个包下，解决Class属性的可访问性
-                String packageFullName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
-
-                System.out.println("LHDDD ======================= = " + packageFullName);
+                String packageFullName = DUtil.getUtil().getElementUtils().getPackageOf(typeElement).getQualifiedName().toString();
 
                 JavaFile javaFile = JavaFile.builder(packageFullName, typeSpec).build();
                 // 生成class文件
-                javaFile.writeTo(filer);
+                javaFile.writeTo(DUtil.getUtil().getFiler());
 
 
             } catch (Exception ex) {
                 ex.printStackTrace();
+                DUtil.error(ex.getMessage());
             }
 
 
         }
 
 
-    }
-
-    private String getClassName(TypeElement type, String pkgName) {
-        int packageLength = pkgName.length() + 1;
-
-        messager.printMessage(Diagnostic.Kind.NOTE, "pakageName = " + pkgName + "  type.getQualifiedName().toString() = " + type.getQualifiedName().toString());
-
-        //com.example.compileannotation.TestAdapter.TestHolder
-        return type.getQualifiedName().toString().substring(packageLength).replace('.', '$');
-    }
-
-    private String getPackageName(TypeElement type) {
-        return elementUtils.getPackageOf(type).getQualifiedName().toString();
     }
 
 }

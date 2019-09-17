@@ -180,7 +180,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         // 变量类型的完整类路径（比如：android.widget.TextView）
 //                        String variableFullName = e.getSimpleName().toString();
 
-                        // 获取 BindView 注解的值
+                        // 获取 ClickEvent 注解的值
                         ClickEvent dBindView = e.getAnnotation(ClickEvent.class);
                         if (dBindView != null) {
                             int viewId = dBindView.value();
@@ -209,7 +209,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         }
 
 
-                        // 获取 BindView 注解的值
+                        // 获取 LongClickEvent 注解的值
                         LongClickEvent dBindView2 = e.getAnnotation(LongClickEvent.class);
 
                         if (dBindView2 != null) {
@@ -239,6 +239,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
                         }
 
+                        // 获取 ClickEvents 注解的值
                         ClickEvents clickEvents = e.getAnnotation(ClickEvents.class);
                         DUtil.log("LHDDD" + "  点击事件组 = clickEvents = " + clickEvents);
                         if (clickEvents != null && clickEvents.value().length > 0) {
@@ -286,9 +287,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
                         }
 
-
                     }
-
 
                 }
 

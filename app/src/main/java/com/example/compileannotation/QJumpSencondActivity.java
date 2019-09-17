@@ -22,9 +22,8 @@ public class QJumpSencondActivity {
             return this;
         }
 
-        public QJumpSencondActivity setFromTo(Context context, Class<?> cls) {
+        public QJumpSencondActivity setFrom(Context context) {
             this.ctx = context;
-            this.cls = cls;
             return this;
         }
 

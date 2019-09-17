@@ -9,8 +9,11 @@ import android.widget.TextView;
 
 import com.example.annotation.BindView;
 import com.example.annotation.QJump;
+import com.example.annotation.QtInject;
+import com.example.dcompiler.AndJump;
 import com.example.dcompiler.DInject;
 
+@QtInject
 public class SecondActivity extends AppCompatActivity {
 
 
@@ -20,17 +23,29 @@ public class SecondActivity extends AppCompatActivity {
     @QJump
     String name;
 
+    @QtInject
+    String name2;
+
+    @QtInject
+    int value;
+
+    @QtInject
+    TestBean testBean;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
         DInject.inject(this);
 
-        Intent intent = getIntent();
+        AndJump.inject(this);
 
-        String value = intent.getStringExtra("test");
-        Log.i("LHD", "SecondActivity value = " + value);
-        tvName.setText(value);
+//        Intent intent = getIntent();
+//
+//        String value = intent.getStringExtra("test");
+//        Log.i("LHD", "SecondActivity value = " + value + " name2 = " + name2);
+
+        tvName.setText(name2 + " " + value + "  " + testBean.getNameTest());
 
     }
 

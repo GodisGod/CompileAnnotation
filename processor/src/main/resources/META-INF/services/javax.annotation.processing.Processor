@@ -1,2 +1,3 @@
 com.example.processor.ViewInjectProcessor
 com.example.processor.DJumpProcessor
+com.example.processor.Compiler

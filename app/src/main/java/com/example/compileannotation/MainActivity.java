@@ -10,12 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.annotation.BindView;
-import com.example.annotation.ClickEvent;
 import com.example.annotation.ClickEvents;
 import com.example.annotation.LongClickEvent;
+import com.example.annotation.QtInject;
+import com.example.dcompiler.AndJump;
 import com.example.dcompiler.DInject;
 
 //@ViewProcessor(name = "Method")
+@QtInject
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.tv_test)
@@ -27,11 +29,15 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.recycler_test)
     RecyclerView recyclerView;
 
+    @QtInject("name")
+    String name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DInject.inject(this);
+        AndJump.inject(this);
         System.out.println("LHDDD MainActivity DInject");
 
 //        textView.setOnClickListener(new View.OnClickListener() {
@@ -58,17 +64,22 @@ public class MainActivity extends AppCompatActivity {
 ////        intent.putExtra("name", "name");
 ////        intent.setClass(MainActivity.this, SecondActivity.class);
 ////        startActivity(intent);
-//
-//        new QJumpSencondActivity().addParamater("test", "testtest")
-//                .setFromTo(MainActivity.this, SecondActivity.class)
-//                .start();
-//
 //    }
 
     @ClickEvents({R.id.btn_test, R.id.tv_test})
     public void allClickTest(View vvvvvv) {
         if (vvvvvv.getId() == R.id.btn_test) {
             textView.setText("测试编译时注解 btnTest + " + btnTest.getTag().toString());
+
+//            new QJumpSencondActivity()
+//                    .addParamater("test", "testtest")
+//                    .setFrom(MainActivity.this)
+//                    .start();
+            QtSecondActivity.getInstance().setName2("测试跳转")
+                    .setValue(55)
+                    .setTestBean(new TestBean("我也觉得可以"))
+                    .start(MainActivity.this);
+
         } else if (vvvvvv.getId() == R.id.tv_test) {
             textView.setText("测试编译时注解 textView + " + textView.getTag().toString());
         }

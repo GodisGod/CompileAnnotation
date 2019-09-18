@@ -1,8 +1,7 @@
 package com.example.processor.data;
 
 /**
- * author: liutao
- * date: 2016/6/17.
+ * Created by hongda on 2019-09-17.
  */
 public class QtFieldData {
     private String name;

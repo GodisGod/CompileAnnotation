@@ -15,8 +15,7 @@ import java.io.IOException;
 import javax.lang.model.element.Modifier;
 
 /**
- * author: liutao
- * date: 2016/6/17.
+ * Created by hongda on 2019-09-17.
  */
 public class ActivityFactory extends FileFactory {
     private final static String REQUEST_CODE_FIELD_NAME = "requestCode";

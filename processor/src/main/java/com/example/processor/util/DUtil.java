@@ -1,8 +1,9 @@
-package com.example.processor;
+package com.example.processor.util;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 /**
@@ -13,6 +14,7 @@ public class DUtil {
     private Filer filer;
     Elements elementUtils;//操作元素
     private Messager messager;
+    private Types typeUtils;
 
     private static DUtil dUtil = new DUtil();
 
@@ -45,6 +47,14 @@ public class DUtil {
 
     public void setMessager(Messager messager) {
         this.messager = messager;
+    }
+
+    public Types getTypeUtils() {
+        return typeUtils;
+    }
+
+    public void setTypeUtils(Types typeUtils) {
+        this.typeUtils = typeUtils;
     }
 
     public static void log(String log) {

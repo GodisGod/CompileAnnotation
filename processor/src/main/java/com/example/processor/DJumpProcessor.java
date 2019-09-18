@@ -1,6 +1,7 @@
 package com.example.processor;
 
 import com.example.annotation.QJump;
+import com.example.processor.util.DUtil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
 /**
@@ -24,6 +26,7 @@ public class DJumpProcessor extends AbstractProcessor {
     //存放同一个Class下的所有视图注解信息,key = 类名 value = 注解元素集合
     Map<TypeElement, List<Element>> classMap = new HashMap<>();
 
+    private boolean isFirst;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -38,7 +41,22 @@ public class DJumpProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+        if (isFirst) {
+            return false;
+        }
+        isFirst = true;
+
         DUtil.log("快速跳转的注解处理器");
+
+//        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(QJump.class);
+//
+//        for (Element ele : elements) {
+//            if (ele.getKind() == ElementKind.FIELD) {
+//                EleParser.getInstance().parser(processingEnv, ele, false, true);
+//            } else if (ele.getKind() == ElementKind.CLASS) {
+//                EleParser.getInstance().parser(processingEnv, ele, true, true);
+//            }
+//        }
 
 
         DUtil.log("快速跳转的注解处理器处理完毕");

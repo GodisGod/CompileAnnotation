@@ -5,8 +5,7 @@ import com.example.processor.EleParser;
 import java.util.List;
 
 /**
- * author: liutao
- * date: 2016/6/17.
+ * Created by hongda on 2019-09-17.
  */
 public class QtData {
     private List<QtFieldData> list;

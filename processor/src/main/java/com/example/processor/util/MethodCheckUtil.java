@@ -1,4 +1,4 @@
-package com.example.processor;
+package com.example.processor.util;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;

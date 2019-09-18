@@ -1,9 +1,9 @@
 package com.example.processor.factory;
 
-import com.example.processor.UtilMgr;
 import com.example.processor.data.QtData;
 import com.example.processor.data.QtFieldData;
 import com.example.processor.reflect.Reflect;
+import com.example.processor.util.DUtil;
 import com.example.processor.util.StringUtils;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -20,7 +20,7 @@ import javax.lang.model.element.Modifier;
 import static com.squareup.javapoet.MethodSpec.methodBuilder;
 
 /**
- * @author Administrator
+ * Created by hongda on 2019-09-17.
  */
 public abstract class FileFactory {
      final static String PARSER = "parser";
@@ -111,7 +111,7 @@ public abstract class FileFactory {
     void build(TypeSpec.Builder typeBuilder) throws IOException {
         JavaFile.Builder javaBuilder = JavaFile.builder(pageName, typeBuilder.build());
         javaBuilder.addFileComment("The file is auto-generate by processorTool,do not modify!");
-        javaBuilder.build().writeTo(UtilMgr.getMgr().getFiler());
+        javaBuilder.build().writeTo(DUtil.getUtil().getFiler());
     }
     MethodSpec createGetArgsDataMethod() {
         MethodSpec.Builder builder = methodBuilder(GET_ARGSDATA_METHOD_NAME)

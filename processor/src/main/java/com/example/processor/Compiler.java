@@ -2,7 +2,7 @@ package com.example.processor;
 
 import com.example.annotation.QtInit;
 import com.example.annotation.QtInject;
-import com.example.annotation.QtRouter;
+import com.example.processor.util.DUtil;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -35,11 +35,14 @@ public class Compiler extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
-        UtilMgr mgr = UtilMgr.getMgr();
-        mgr.setElementUtils(processingEnv.getElementUtils());
-        mgr.setFiler(processingEnv.getFiler());
-        mgr.setMessager(processingEnv.getMessager());
-        mgr.setTypeUtils(processingEnv.getTypeUtils());
+
+        DUtil dUtil = DUtil.getUtil();
+        dUtil.setElementUtils(processingEnvironment.getElementUtils());
+        dUtil.setFiler(processingEnvironment.getFiler());
+        dUtil.setMessager(processingEnvironment.getMessager());
+        dUtil.setTypeUtils(processingEnvironment.getTypeUtils());
+
+        DUtil.log("初始化   =====================    快速跳转的注解处理器");
     }
 
     @Override
@@ -53,39 +56,35 @@ public class Compiler extends AbstractProcessor {
         EleParser.getInstance().initPreCode();
 
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(QtInject.class);
-        Set<? extends Element> routers = roundEnv.getElementsAnnotatedWith(QtRouter.class);
-        if(!init(roundEnv)){
+
+        if (!init(roundEnv)) {
             return true;
         }
         for (Element ele : elements) {
             if (ele.getKind() == ElementKind.FIELD) {
-                EleParser.getInstance().parser(processingEnv, ele, false,true);
+                EleParser.getInstance().parser(processingEnv, ele, false, true);
             } else if (ele.getKind() == ElementKind.CLASS) {
-                EleParser.getInstance().parser(processingEnv, ele, true,true);
+                EleParser.getInstance().parser(processingEnv, ele, true, true);
             }
         }
-        for (Element ele : routers) {
-            if (ele.getKind() == ElementKind.CLASS) {
-                EleParser.getInstance().parser(processingEnv, ele, true,false);
-            }
-        }
+
         EleParser.getInstance().build();
         log("the auto-generate time is " + (System.currentTimeMillis() - startTime));
         return true;
     }
 
-    public boolean init(RoundEnvironment roundEnv){
+    public boolean init(RoundEnvironment roundEnv) {
         Set<? extends Element> init = roundEnv.getElementsAnnotatedWith(QtInit.class);
-        if(init==null||init.size()==0){
+        if (init == null || init.size() == 0) {
             error("must use @QtInit in your app,Otherwise can not use the @QtInject and @QtRouter");
             return false;
         }
-        if(init.size()>1){
+        if (init.size() > 1) {
             error("the @QtInit Can be used only once ,Otherwise can not use the @QtInject and @QtRouter");
             return false;
         }
-        Element initEle=init.iterator().next();
-        if(initEle.getKind()!=ElementKind.CLASS){
+        Element initEle = init.iterator().next();
+        if (initEle.getKind() != ElementKind.CLASS) {
             error("the @QtInit can only be used in the class");
             return false;
         }
@@ -94,10 +93,10 @@ public class Compiler extends AbstractProcessor {
     }
 
     private void error(String error) {
-        UtilMgr.getMgr().getMessager().printMessage(Diagnostic.Kind.ERROR, TAG + error);
+        DUtil.getUtil().getMessager().printMessage(Diagnostic.Kind.ERROR, TAG + error);
     }
 
     private void log(String log) {
-        UtilMgr.getMgr().getMessager().printMessage(Diagnostic.Kind.WARNING, TAG + log);
+        DUtil.getUtil().getMessager().printMessage(Diagnostic.Kind.WARNING, TAG + log);
     }
 }

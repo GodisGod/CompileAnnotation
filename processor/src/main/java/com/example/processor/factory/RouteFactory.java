@@ -1,8 +1,8 @@
 package com.example.processor.factory;
 
 import com.example.annotation.QtRouter;
+import com.example.processor.util.DUtil;
 import com.example.processor.EleParser;
-import com.example.processor.UtilMgr;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -20,9 +20,8 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 
 /**
- * Created by liutao on 05/07/2017.
+ * Created by hongda on 2019-09-17.
  */
-
 public class RouteFactory {
     private static String MODEL_CLASS_NAME = "";
     private static String ROUTE_NAME = "QtInitializer";
@@ -39,7 +38,7 @@ public class RouteFactory {
     }
 
     private void initRoute() {
-        TypeElement activityType = UtilMgr.getMgr().getElementUtils().getTypeElement("android.app.Activity");
+        TypeElement activityType = DUtil.getUtil().getElementUtils().getTypeElement("android.app.Activity");
         ParameterizedTypeName mapTypeName = ParameterizedTypeName
                 .get(ClassName.get(Map.class), ClassName.get(String.class), ParameterizedTypeName.get(ClassName.get(Class.class),
                         WildcardTypeName.subtypeOf(ClassName.get(activityType))));
@@ -54,36 +53,37 @@ public class RouteFactory {
     }
 
     private void initInject() {
-        TypeElement injectType = UtilMgr.getMgr().getElementUtils().getTypeElement(I_INJECT_PATH);
+        TypeElement injectType = DUtil.getUtil().getElementUtils().getTypeElement(I_INJECT_PATH);
 
         ParameterizedTypeName mapTypeName = ParameterizedTypeName
                 .get(ClassName.get(List.class), ClassName.get(injectType));
         injectInitBuilder = MethodSpec.methodBuilder(Inject_METHOD_NAME)
                 .addModifiers(Modifier.PUBLIC)
                 .addModifiers(Modifier.STATIC)
-                .addCode("List<"+I_INJECT_PATH+"> data =new java.util.ArrayList<>();\n")
+                .addCode("List<" + I_INJECT_PATH + "> data =new java.util.ArrayList<>();\n")
                 .returns(mapTypeName);
     }
 
     public void parserRouter(Element element, EleParser.ElementType elementType) {
-        if(elementType== EleParser.ElementType.APPLICATION){
+        if (elementType == EleParser.ElementType.APPLICATION) {
             return;
         }
         //路由url
         QtRouter router = element.getAnnotation(QtRouter.class);
         String[] routerUrls = router.value();
-        if(elementType== EleParser.ElementType.ACTIVITY){
+        if (elementType == EleParser.ElementType.ACTIVITY) {
             for (String routerUrl : routerUrls) {
                 routerInitBuilder.addStatement("router.put($S, $T.class)", routerUrl, ClassName.get((TypeElement) element));
             }
         }
     }
-    public void parserInject(Element element, EleParser.ElementType elementType){
-        if(elementType== EleParser.ElementType.APPLICATION){
+
+    public void parserInject(Element element, EleParser.ElementType elementType) {
+        if (elementType == EleParser.ElementType.APPLICATION) {
             return;
         }
         //init inject
-        injectInitBuilder.addCode("data.add(" +getPkgName((TypeElement) element)+"."+ String.valueOf("Qt" + ( element).getSimpleName().toString() + ".getInstance());\n"));
+        injectInitBuilder.addCode("data.add(" + getPkgName((TypeElement) element) + "." + String.valueOf("Qt" + (element).getSimpleName().toString() + ".getInstance());\n"));
     }
 
     public void generateRouter() {
@@ -101,7 +101,7 @@ public class RouteFactory {
 
         try {
             if (type != null) {
-                JavaFile.builder(MODEL_CLASS_NAME, type).build().writeTo(UtilMgr.getMgr().getFiler());
+                JavaFile.builder(MODEL_CLASS_NAME, type).build().writeTo(DUtil.getUtil().getFiler());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,10 +127,11 @@ public class RouteFactory {
     }
 
     TypeElement getParentClass(TypeElement child) {
-        return (TypeElement) UtilMgr.getMgr().getTypeUtils().asElement(child.getSuperclass());
+        return (TypeElement) DUtil.getUtil().getTypeUtils().asElement(child.getSuperclass());
     }
+
     public String getPkgName(TypeElement typeElement) {
-        PackageElement pkgElement = UtilMgr.getMgr().getElementUtils().getPackageOf(typeElement);
+        PackageElement pkgElement = DUtil.getUtil().getElementUtils().getPackageOf(typeElement);
         return pkgElement.isUnnamed() ? "" : pkgElement.getQualifiedName().toString();
     }
 

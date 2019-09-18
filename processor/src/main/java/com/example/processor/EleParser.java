@@ -7,6 +7,7 @@ import com.example.processor.data.QtFieldData;
 import com.example.processor.factory.ActivityFactory;
 import com.example.processor.factory.FragmentFactory;
 import com.example.processor.factory.RouteFactory;
+import com.example.processor.util.DUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,10 +24,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
-/**
- * author: liutao
- * date: 2016/6/17.
- */
+
 public class EleParser {
     private static final String APP_NAME = "android.app.Application";//
     private static final String APPLOGIC_NAME = "android.app.Application";//
@@ -117,11 +115,15 @@ public class EleParser {
         ElementType type = getElementType(typeElement);
         key = key + SPLIT + type.name();
 
+
         fields = fieldMap.get(key);
+
         if (fields == null) {
             QtInject qtInject = element.getAnnotation(QtInject.class);
+
             bundleName = qtInject.bundle();
             fieldMap.put(key, fields = new ArrayList<VariableElement>());
+
             ClazzData data = new ClazzData();
             data.setBundleName(bundleName);
             data.setAbstract(isAbstract(typeElement));
@@ -166,7 +168,7 @@ public class EleParser {
     }
 
     TypeElement getParentClass(TypeElement child) {
-        return (TypeElement) UtilMgr.getMgr().getTypeUtils().asElement(child.getSuperclass());
+        return (TypeElement) DUtil.getUtil().getTypeUtils().asElement(child.getSuperclass());
     }
 
     private void parserData() {
@@ -238,7 +240,7 @@ public class EleParser {
     }
 
     public String getPkgName(TypeElement typeElement) {
-        PackageElement pkgElement = UtilMgr.getMgr().getElementUtils().getPackageOf(typeElement);
+        PackageElement pkgElement = DUtil.getUtil().getElementUtils().getPackageOf(typeElement);
         return pkgElement.isUnnamed() ? "" : pkgElement.getQualifiedName().toString();
     }
 }

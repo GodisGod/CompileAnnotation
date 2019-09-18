@@ -15,7 +15,7 @@ import java.io.IOException;
 import javax.lang.model.element.Modifier;
 
 /**
- * @author Administrator
+ * Created by hongda on 2019-09-17.
  */
 public class FragmentFactory extends FileFactory {
     static final String SUFFIX = "Qt";

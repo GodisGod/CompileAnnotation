@@ -28,7 +28,7 @@ public class DInject {
 
         try {
             if (constructor == null) {
-                throw new IllegalAccessException(target.getClass().getName() + "类未使用注解,不必使用DInject.inject()");
+                Log.e("LHD", target.getClass().getName() + "类未使用注解,不必使用DInject.inject()");
             } else {
                 constructor.newInstance(target, view);
             }

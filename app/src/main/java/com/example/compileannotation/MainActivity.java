@@ -16,7 +16,6 @@ import com.example.annotation.QtInject;
 import com.example.dcompiler.AndJump;
 import com.example.dcompiler.DInject;
 
-//@ViewProcessor(name = "Method")
 @QtInject
 public class MainActivity extends AppCompatActivity {
 
@@ -60,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
 //    public void onClickTest() {
 //        textView.setText("测试编译时注解 btnTest");
 //
-////        Intent intent = new Intent();
-////        intent.putExtra("name", "name");
-////        intent.setClass(MainActivity.this, SecondActivity.class);
-////        startActivity(intent);
+//        Intent intent = new Intent();
+//        intent.putExtra("name", "name");
+//        intent.setClass(MainActivity.this, SecondActivity.class);
+//        startActivity(intent);
 //    }
 
     @ClickEvents({R.id.btn_test, R.id.tv_test})

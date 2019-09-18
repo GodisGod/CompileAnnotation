@@ -28,7 +28,8 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'
 
     implementation project(path: ':dcompiler')
-    implementation project(path: ':annotation')
+//    implementation project(path: ':annotation')
+    implementation 'com.github.GodisGod.CompileAnnotation:annotation:1.0.2'
     annotationProcessor project(path: ':processor')
 
 //    annotationProcessor files('/libs/processor.jar')

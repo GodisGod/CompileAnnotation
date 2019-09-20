@@ -15,7 +15,6 @@ import com.example.annotation.QtInject;
 import com.example.dcompiler.AndJump;
 import com.example.dcompiler.DInject;
 
-@QJump
 @QtInject
 public class SecondActivity extends AppCompatActivity {
 

@@ -31,21 +31,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-
-//    implementation project(path: ':annotation')
-    implementation 'com.github.GodisGod.CompileAnnotation:annotation:1.0.2'
+    implementation project(path: ':annotation')
+//    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.1'
 }
-
-
-//task makeJar(type: Copy) {
-//    delete 'build/libs/SlidingMenuHbh.jar' //删除已经存在的jar包，如果有的话
-//    from('build/intermediates/bundles/default/')//从该目录下加载要打包的文件，注意文件夹名称有可能为default，也可能是release，自己看一下
-//    into('build/libs/')//jar包的保存目录
-//    include('classes.jar')//设置过滤，只打包classes文件
-//    rename('classes.jar', 'SlidingMenuHbh.jar')//重命名，SlidingMenuHbh.jar 名字自己随便起
-//}
-//makeJar.dependsOn(build)

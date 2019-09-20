@@ -12,10 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.annotation.BindView;
 import com.example.annotation.ClickEvents;
 import com.example.annotation.LongClickEvent;
+import com.example.annotation.QJump;
 import com.example.annotation.QtInject;
 import com.example.dcompiler.AndJump;
 import com.example.dcompiler.DInject;
 
+@QJump
 @QtInject
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +32,12 @@ public class MainActivity extends AppCompatActivity {
 
     @QtInject("name")
     String name;
+
+    @QJump
+    String testJump;
+
+    @QJump
+    int value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
                     .setValue(55)
                     .setTestBean(new TestBean("我也觉得可以"))
                     .start(MainActivity.this);
+
+//            QSecondActivity.getInstance().setName("梦璃")
+//                    .setJumpTest("从未来")
+//                    .setValue2(16)
+//                    .setTestBean2(new TestBean("可爱的"))
+//                    .start(MainActivity.this);
 
         } else if (vvvvvv.getId() == R.id.tv_test) {
             textView.setText("测试编译时注解 textView + " + textView.getTag().toString());

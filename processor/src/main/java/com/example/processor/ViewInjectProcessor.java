@@ -42,6 +42,8 @@ public class ViewInjectProcessor extends AbstractProcessor {
     //存放同一个Class下的所有视图注解信息,key = 类名 value = 注解元素集合
     Map<TypeElement, List<Element>> classMap = new HashMap<>();
 
+    private boolean isFirst = false;
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
@@ -54,6 +56,10 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+        if (isFirst) {
+            return false;
+        }
+        isFirst = true;
         System.out.println("====================================");
         //1、收集 Class 内的所有被 @BindView 注解的成员变量；
         collectInfo(roundEnvironment);
@@ -79,6 +85,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
     }
 
     private void collectInfo(RoundEnvironment roundEnvironment) {
+
         classMap.clear();
 
         DUtil.log("开始收集注解信息");
@@ -146,8 +153,6 @@ public class ViewInjectProcessor extends AbstractProcessor {
                     .addParameter(ClassName.get("android.view", "View"), "v");
 
             try {
-                // Class的完整路径
-                String classFullName = typeElement.getQualifiedName().toString();
 
                 List<Element> elements = classMap.get(typeElement);
 
@@ -165,7 +170,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
                         int viewId = bindView.value();
 
                         // 在构造方法中增加赋值语句，例如：target.tv = (android.widget.TextView)v.findViewById(215334);
-                        DUtil.log("LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
+//                        DUtil.log("LHDDD variableName = " + variableName + "  variableFullName = " + variableFullName + "  variableInfo.getViewId() = " + viewId);
 
                         // target.textView=(android.widget.TextView)v.findViewById(2131165326);
                         methodBuilder.addStatement("target.$L=($L)v.findViewById($L)", variableName, variableFullName, viewId);
@@ -242,11 +247,11 @@ public class ViewInjectProcessor extends AbstractProcessor {
 
                         // 获取 ClickEvents 注解的值
                         ClickEvents clickEvents = e.getAnnotation(ClickEvents.class);
-                        DUtil.log("LHDDD" + "  点击事件组 = clickEvents = " + clickEvents);
+//                        DUtil.log("LHDDD" + "  点击事件组 = clickEvents = " + clickEvents);
                         if (clickEvents != null && clickEvents.value().length > 0) {
 
                             List<? extends VariableElement> parameters = ((ExecutableElement) e).getParameters();
-                            DUtil.log("注解的方法的参数 = " + parameters.size() + " " + parameters.get(0));
+//                            DUtil.log("注解的方法的参数 = " + parameters.size() + " " + parameters.get(0));
                             if (parameters == null || parameters.size() != 1) {
                                 DUtil.error("注解的方法必须有且只能有一个参数" + parameters.size());
                                 return;

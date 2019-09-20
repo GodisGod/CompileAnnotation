@@ -16,7 +16,8 @@ public class StringUtils {
 		StringBuffer sb = getUpperMethod(fieldName);
 		return "set" + sb.toString();
 	}
-	
+
+	//首字母大写
 	private static StringBuffer getUpperMethod(String fieldName) {
 		char[] charArray = fieldName.toCharArray();
 		StringBuffer sb = new StringBuffer();

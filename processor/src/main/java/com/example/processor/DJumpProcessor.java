@@ -2,6 +2,7 @@ package com.example.processor;
 
 import com.example.annotation.QJump;
 import com.example.processor.util.DUtil;
+import com.example.processor.util.ParserEleUtil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ public class DJumpProcessor extends AbstractProcessor {
     //存放同一个Class下的所有视图注解信息,key = 类名 value = 注解元素集合
     Map<TypeElement, List<Element>> classMap = new HashMap<>();
 
-    private boolean isFirst;
+    private boolean isFirst = false;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -35,7 +36,7 @@ public class DJumpProcessor extends AbstractProcessor {
         dUtil.setElementUtils(processingEnvironment.getElementUtils());
         dUtil.setFiler(processingEnvironment.getFiler());
         dUtil.setMessager(processingEnvironment.getMessager());
-
+        dUtil.setTypeUtils(processingEnvironment.getTypeUtils());
         DUtil.log("初始化   =====================    快速跳转的注解处理器");
     }
 
@@ -48,16 +49,17 @@ public class DJumpProcessor extends AbstractProcessor {
 
         DUtil.log("快速跳转的注解处理器");
 
-//        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(QJump.class);
-//
-//        for (Element ele : elements) {
-//            if (ele.getKind() == ElementKind.FIELD) {
-//                EleParser.getInstance().parser(processingEnv, ele, false, true);
-//            } else if (ele.getKind() == ElementKind.CLASS) {
-//                EleParser.getInstance().parser(processingEnv, ele, true, true);
-//            }
-//        }
+        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(QJump.class);
 
+        for (Element ele : elements) {
+            if (ele.getKind() == ElementKind.FIELD) {
+                ParserEleUtil.getInstance().parserEle(ele, false);
+            } else if (ele.getKind() == ElementKind.CLASS) {
+                ParserEleUtil.getInstance().parserEle(ele, true);
+            }
+        }
+
+        ParserEleUtil.getInstance().generateCode();
 
         DUtil.log("快速跳转的注解处理器处理完毕");
         return false;

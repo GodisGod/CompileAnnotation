@@ -82,16 +82,16 @@ public class MainActivity extends AppCompatActivity {
 //                    .addParamater("test", "testtest")
 //                    .setFrom(MainActivity.this)
 //                    .start();
-            QtSecondActivity.getInstance().setName2("测试跳转")
-                    .setValue(55)
-                    .setTestBean(new TestBean("我也觉得可以"))
-                    .start(MainActivity.this);
-
-//            QSecondActivity.getInstance().setName("梦璃")
-//                    .setJumpTest("从未来")
-//                    .setValue2(16)
-//                    .setTestBean2(new TestBean("可爱的"))
+//            QtSecondActivity.getInstance().setName2("测试跳转")
+//                    .setValue(55)
+//                    .setTestBean(new TestBean("我也觉得可以"))
 //                    .start(MainActivity.this);
+
+            QSecondActivity.getInstance().setName("梦璃")
+                    .setJumpTest("从未来")
+                    .setValue2(16)
+                    .setTestBean2(new TestBean("可爱的"))
+                    .start(MainActivity.this);
 
         } else if (vvvvvv.getId() == R.id.tv_test) {
             textView.setText("测试编译时注解 textView + " + textView.getTag().toString());

@@ -225,6 +225,7 @@ public class ParserEleUtil {
             GenerateCodeUtil.generateActivityStartCode(builder, typeElement);
         } else {
             GenerateCodeUtil.generateFragmentCode(injectBuilder, values);
+            GenerateCodeUtil.generateFragmentBuildCode(builder, typeElement);
         }
 
         builder.addMethod(injectBuilder.build());

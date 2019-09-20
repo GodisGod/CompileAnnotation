@@ -35,7 +35,6 @@ public class SecondActivity extends AppCompatActivity {
     @BindView(R.id.container)
     FrameLayout frameLayout;
 
-
     @QJump
     String name;
 
@@ -56,20 +55,21 @@ public class SecondActivity extends AppCompatActivity {
 
 //        AndJump.inject(this);
 
-//        QSecondActivity.inject(this);
+        QSecondActivity.inject(this);
 
 //        Intent intent = getIntent();
 //
 //        String value = intent.getStringExtra("test");
 //        Log.i("LHD", "SecondActivity value = " + value + " name2 = " + name2);
 
-        tvName.setText(name2 + " " + value + "  " + testBean.getNameTest());
+//        tvName.setText(name2 + " " + value + "  " + testBean.getNameTest());
 
 //        BlankFragment blankFragment = BlankFragment.newInstance("小小琳", "可爱哟");
+        BlankFragment blankFragment = QBlankFragment.getInstance().setFragmentTest("小英").build();
 
-//        tvName.setText(jumpTest + " " + name + "  " + value2 + "  " + testBean2.getNameTest());
+        tvName.setText(jumpTest + " " + name + "  " + value2 + "  " + testBean2.getNameTest());
 
-        BlankFragment blankFragment = QtBlankFragment.getInstance().setMParam1("琳琳").build();
+//        BlankFragment blankFragment = QtBlankFragment.getInstance().setMParam1("琳琳").build();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.container, blankFragment);
         transaction.commitAllowingStateLoss();

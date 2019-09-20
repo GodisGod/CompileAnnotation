@@ -74,7 +74,9 @@ public class BlankFragment extends Fragment {
         }
 
 
-        AndJump.inject(this);
+//        AndJump.inject(this);
+
+        QBlankFragment.inject(this);
 
     }
 
@@ -86,7 +88,7 @@ public class BlankFragment extends Fragment {
         // Inflate the layout for this fragment
 
 
-        tvName.setText(mParam1);
+        tvName.setText(fragmentTest);
         return view;
     }
 

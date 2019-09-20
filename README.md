@@ -7,7 +7,7 @@
 使用方法：
 
 视图绑定和点击事件绑定功能
-
+```java
     @BindView(R.id.tv_test)
     TextView textView;
 
@@ -19,21 +19,22 @@
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
         //视图绑定和点击事件绑定功能需要
-        DInject.inject(this);
-        QSecondActivity.inject(this);
-   }
+        DInject.inject(this);}
     
-    //绑定多个点击事件
+    //绑定多个点击事件,方法名字可随意取
     @ClickEvents({R.id.btn_test, R.id.tv_test})
     public void allClickTest(View v) {
     }
-    //绑定单个点击事件
+    //绑定单个点击事件,方法名字可随意取
     @ClickEvent(R.id.btn_test)
     public void onClickTest() {}
+    //绑定长按点击事件,方法名字可随意取
     @LongClickEvent(R.id.tv_test)
     public void onLongClickTest()
-    
+```  
 快速传值功能：
+
+```java
 public class SecondActivity extends AppCompatActivity {
     //在需要传递的参数上使用注解
     @QJump
@@ -42,7 +43,6 @@ public class SecondActivity extends AppCompatActivity {
     int value;
     @QJump
     TestBean testBean;
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +52,7 @@ public class SecondActivity extends AppCompatActivity {
         //然后就可以直接使用参数啦
         Log.i("test","name = "+name+" value = "+value);
    }
-   
 }
-    
+``` 
 
 

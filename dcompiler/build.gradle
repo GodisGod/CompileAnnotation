@@ -1,8 +1,9 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
-group = 'com.github.GodisGod'
-version = '1.0.1'
+//apply plugin: 'com.github.dcendents.android-maven'
+//
+//group = 'com.github.GodisGod'
+//version = '1.0.1'
 
 android {
     compileSdkVersion 29
@@ -32,5 +33,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(path: ':annotation')
-//    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.1'
+    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.1'
 }

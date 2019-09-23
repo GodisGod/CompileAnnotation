@@ -28,9 +28,14 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'
 
-//    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.1'
     implementation project(path: ':annotation')
     implementation project(path: ':dcompiler')
     annotationProcessor project(path: ':processor')
+
+    def base = rootProject.ext.baseDependencies
+    def version2 = base.annotation
+    println("app远程依赖 = "+version2)
+//    implementation version2
+
 
 }

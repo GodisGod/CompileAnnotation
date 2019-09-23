@@ -1,0 +1,10 @@
+ext {
+    annotationVersion = "2.0.2"
+    dcompilerVsersion = "2.0.1"
+    processorVersion = "2.0.1"
+
+    baseDependencies = [
+            annotation: "com.github.GodisGod.CompileAnnotation:annotation:${annotationVersion}"
+    ]
+
+}

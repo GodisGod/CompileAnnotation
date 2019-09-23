@@ -2,14 +2,16 @@ apply plugin: 'java-library'
 //配置processor
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.GodisGod'
+group = 'com.github.GodisGod'
 
 dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'com.squareup:javapoet:1.9.0'
-    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.1'
+//    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.1'
 //    implementation project(path: ':annotation')
+
+    implementation 'com.github.GodisGod:CompileAnnotation:2.0.2'
 
 }
 

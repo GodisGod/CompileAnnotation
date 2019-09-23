@@ -33,26 +33,28 @@ dependencies {
 
     //两种方式获取版本号
     //1通过提供的方法获取属性
-    def config = rootProject.extensions.getByName("ext")
-    def annotation_version = config.getAt("annotationVersion")
-    println("1111>>>>>>>>>>>>>>>>>>>>>" + annotation_version)
-
-    //2直接获取属性
-    def version = rootProject.ext.annotationVersion
-    println("2222>>>>>>>>#######>>>>>>>>" + version)
-
-    //3通过数组获取属性
-    def base = rootProject.ext.baseDependencies
-    def version2 = base.annotation
-    println("3333>>>>>>>>>>>>>>>>>>>>>>" + version2)
+//    def config = rootProject.extensions.getByName("ext")
+//    def annotation_version = config.getAt("annotationVersion")
+//    println("1111>>>>>>>>>>>>>>>>>>>>>" + annotation_version)
+//
+//    //2直接获取属性
+//    def version = rootProject.ext.annotationVersion
+//    println("2222>>>>>>>>#######>>>>>>>>" + version)
+//
+//    //3通过数组获取属性
+//    def base = rootProject.ext.baseDependencies
+//    def version2 = base.annotation
+//    println("3333>>>>>>>>>>>>>>>>>>>>>>" + version2)
 
 //    println("是否远程依赖 = " + compileLib)
 //    if (compileLib) {
 //        println("远程依赖")
 //        implementation version2
 //    } else {
-        println("本地依赖")
-        implementation project(path: ':annotation')
+//        println("本地依赖")
+//        implementation project(path: ':annotation')
 //    }
+
+    implementation 'com.github.GodisGod:CompileAnnotation:2.0.2'
 
 }

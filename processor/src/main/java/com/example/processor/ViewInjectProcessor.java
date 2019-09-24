@@ -61,7 +61,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
         }
         isFirst = true;
         System.out.println("====================================");
-        //1、收集 Class 内的所有被 @BindView 注解的成员变量；
+        //1、收集 Class 内的所有被注解的成员变量；
         collectInfo(roundEnvironment);
         //2、根据上一步收集的内容，生成 .java 源文件。
         generateCode();
@@ -74,6 +74,7 @@ public class ViewInjectProcessor extends AbstractProcessor {
         Set<String> annotationTypes = new HashSet<>();
         annotationTypes.add(BindView.class.getCanonicalName());
         annotationTypes.add(ClickEvent.class.getCanonicalName());
+        annotationTypes.add(ClickEvents.class.getCanonicalName());
         annotationTypes.add(LongClickEvent.class.getCanonicalName());
         return annotationTypes;
     }

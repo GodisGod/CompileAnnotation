@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
 public @interface ClickEvents {
-    int[] value();//需要绑定点击事件的控件的id
+    int[] value();//需要绑定点击事件的控件的id数组
 }

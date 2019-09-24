@@ -55,6 +55,7 @@ dependencies {
 //        implementation project(path: ':annotation')
 //    }
 
-    implementation 'com.github.GodisGod:CompileAnnotation:2.0.2'
+    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.3'
+
 
 }

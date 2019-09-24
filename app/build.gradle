@@ -32,7 +32,7 @@ dependencies {
     implementation project(path: ':dcompiler')
     annotationProcessor project(path: ':processor')
 
-    implementation 'com.github.GodisGod:CompileAnnotation:2.0.2'
+    implementation 'com.github.GodisGod.CompileAnnotation:annotation:2.0.3'
 //    def base = rootProject.ext.baseDependencies
 //    def version2 = base.annotation
 //    println("app远程依赖 = "+version2)
